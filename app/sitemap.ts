@@ -1,1 +1,2 @@
-export default function sitemap(){return [{url:"https://air-phalia-campus.sy11.chatgpt.site",lastModified:new Date()},{url:"https://air-phalia-campus.sy11.chatgpt.site/privacy",lastModified:new Date()}]}
+import {SITE_URL} from "../lib/site";
+export default function sitemap(){return [{url:SITE_URL,lastModified:new Date()},{url:SITE_URL+"/privacy",lastModified:new Date()}]}
