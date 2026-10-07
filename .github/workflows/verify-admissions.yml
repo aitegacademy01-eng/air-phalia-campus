@@ -1,0 +1,16 @@
+name: Verify admissions (production)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/gracious-volta-5c59fu]
+    paths: [scripts/verify-admissions.sh, .github/workflows/verify-admissions.yml]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash scripts/verify-admissions.sh
+        env:
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
