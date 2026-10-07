@@ -21,8 +21,9 @@ id=$(jq -r '.id // empty' <<<"$json" 2>/dev/null)
 if [ "$status" = 200 ] && [ -n "$id" ]; then ok "test enquiry accepted and saved (id $id)"; else bad "test enquiry not saved (HTTP $status: $(jq -r '.error // "no message"' <<<"$json" 2>/dev/null))"; fi
 
 # 4. Staff access protection
-[ "$(code "$BASE/api/admin/enquiries")" = 401 ] && ok "admin API rejects missing token" || bad "admin API did not reject missing token"
-[ "$(code -H 'Authorization: Bearer wrong-token-check' "$BASE/api/admin/enquiries")" = 401 ] && ok "admin API rejects wrong token" || bad "admin API did not reject wrong token"
+nc=$(code "$BASE/api/admin/enquiries")
+case "$nc" in 401) ok "admin API rejects missing token (ADMIN_TOKEN is configured on the server)";; 503) bad "ADMIN_TOKEN is NOT configured on the live server (add it in Vercel, then redeploy)";; *) bad "admin API returned $nc without a token";; esac
+wc=$(code -H 'Authorization: Bearer wrong-token-check' "$BASE/api/admin/enquiries"); [ "$wc" = 401 ] || [ "$wc" = 503 ] && ok "admin API rejects wrong token" || bad "admin API returned $wc for a wrong token"
 
 # 3. Retrieve and update via the protected admin API (needs repo secret ADMIN_TOKEN)
 if [ -z "${ADMIN_TOKEN:-}" ]; then
@@ -31,7 +32,7 @@ elif [ -z "$id" ]; then
   echo "SKIP  admin retrieval/update: no test enquiry id"
 else
   [ ${#ADMIN_TOKEN} -ge 24 ] && ok "ADMIN_TOKEN length is 24+ characters" || bad "ADMIN_TOKEN is shorter than 24 characters (use a longer random value)"
-  auth="Authorization: Bearer $ADMIN_TOKEN"
+  ADMIN_TOKEN="$(printf %s "$ADMIN_TOKEN" | tr -d "\r\n" | sed "s/^ *//;s/ *$//")"; auth="Authorization: Bearer $ADMIN_TOKEN"
   list=$(curl -s --max-time 30 -H "$auth" "$BASE/api/admin/enquiries")
   row=$(jq -c --arg id "$id" '[.[]? | select(.id==$id)][0] // empty | {name,level,status}' <<<"$list" 2>/dev/null)
   [ -n "$row" ] && ok "test enquiry retrieved from admin API: $row" || bad "test enquiry not found via admin API (token mismatch or not stored)"
