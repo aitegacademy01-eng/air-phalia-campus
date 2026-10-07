@@ -1,1 +1,1 @@
-import {runtime} from "../../../lib/server";export async function GET(){const n=runtime().SCHOOL_WHATSAPP_NUMBER||"";return Response.json({whatsapp:/^[1-9][0-9]{9,14}$/.test(n)?n:null},{headers:{"Cache-Control":"public, max-age=60"}})}
+import {runtime} from "../../../lib/server";export const dynamic="force-dynamic";export async function GET(){const n=runtime().SCHOOL_WHATSAPP_NUMBER||"";return Response.json({whatsapp:/^[1-9][0-9]{9,14}$/.test(n)?n:null},{headers:{"Cache-Control":"public, max-age=60"}})}

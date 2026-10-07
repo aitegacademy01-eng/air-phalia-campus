@@ -1,6 +1,6 @@
-import {env} from "cloudflare:workers";
-export const runtime=()=>env as Cloudflare.Env & Record<string,string|undefined>;
-export function database(){if(!env.DB)throw new Error("Database unavailable");return env.DB;}
-export async function limit(request:Request,scope:string,max=12){const ip=request.headers.get("cf-connecting-ip")||"shared";const key=scope+":"+ip+":"+Math.floor(Date.now()/60000);const db=database();await db.prepare("INSERT INTO request_limits(id,count,expires_at) VALUES (?,1,?) ON CONFLICT(id) DO UPDATE SET count=count+1").bind(key,Date.now()+120000).run();const row=await db.prepare("SELECT count FROM request_limits WHERE id=?").bind(key).first<{count:number}>();await db.prepare("DELETE FROM request_limits WHERE expires_at < ?").bind(Date.now()).run();return (row?.count||0)<=max;}
-export function sameOrigin(r:Request){return r.headers.get("origin")===new URL(r.url).origin;}
+import {store} from "./store";
+export const runtime=()=>process.env as Record<string,string|undefined>;
+export function clientIp(r:Request){return r.headers.get("x-real-ip")||r.headers.get("x-forwarded-for")?.split(",")[0]?.trim()||"shared";}
+export async function limit(request:Request,scope:string,max=12){const key=scope+":"+clientIp(request)+":"+Math.floor(Date.now()/60000);return (await store().hit(key,120000))<=max;}
+export function sameOrigin(r:Request){const origin=r.headers.get("origin");if(!origin)return false;const host=r.headers.get("x-forwarded-host")||r.headers.get("host");try{return new URL(origin).host===host;}catch{return false;}}
 export async function reply(message:string){const e=runtime();if(!e.OPENAI_API_KEY)return null;const {knowledge}=await import("./school");const r=await fetch("https://api.openai.com/v1/chat/completions",{method:"POST",headers:{Authorization:"Bearer "+e.OPENAI_API_KEY,"Content-Type":"application/json"},body:JSON.stringify({model:e.OPENAI_MODEL||"gpt-4.1-mini",messages:[{role:"system",content:knowledge},{role:"user",content:message}],max_completion_tokens:250}),signal:AbortSignal.timeout(12000)});if(!r.ok)throw new Error("AI unavailable");const d=await r.json() as {choices:{message:{content:string}}[]};return d.choices[0]?.message.content;}
