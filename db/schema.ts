@@ -1,0 +1,4 @@
+import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+export const enquiries = sqliteTable("enquiries", { id:text("id").primaryKey(), name:text("name").notNull(), phone:text("phone").notNull(), level:text("level").notNull(), message:text("message").notNull(), status:text("status").notNull().default("new"), createdAt:integer("created_at").notNull() });
+export const events=sqliteTable("webhook_events",{id:text("id").primaryKey(),createdAt:integer("created_at").notNull()});
+export const limits=sqliteTable("request_limits",{id:text("id").primaryKey(),count:integer("count").notNull(),expiresAt:integer("expires_at").notNull()});

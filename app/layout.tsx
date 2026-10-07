@@ -1,0 +1,3 @@
+import type {Metadata} from "next";import "./globals.css";
+export const metadata:Metadata={metadataBase:new URL("https://air-phalia-campus.sy11.chatgpt.site"),title:"AIR Foundation School System | Phalia Campus",description:"Explore Pre School, Junior Campus and High School at AIR Foundation School System, Phalia. Admission enquiries, campus contact and future skills learning roadmap.",icons:{icon:"/favicon.svg"},alternates:{canonical:"/"},openGraph:{title:"AIR Foundation School System · Phalia Campus",description:"A strong foundation. A future of possibilities.",type:"website"},robots:{index:true,follow:true}};
+export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="en"><body>{children}</body></html>}

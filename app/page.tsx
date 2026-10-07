@@ -1,0 +1,2 @@
+import School from "../components/school";
+export default function Page(){return <><script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify({"@context":"https://schema.org","@type":"School",name:"AIR Foundation School System — Phalia Campus",url:"https://air-phalia-campus.sy11.chatgpt.site",telephone:"+923355361300",email:"afss@gmail.com",address:{"@type":"PostalAddress",streetAddress:"Mugho Pindi Road Near Eid Gah",addressLocality:"Phalia",addressCountry:"PK"}})}}/><School/></>}
