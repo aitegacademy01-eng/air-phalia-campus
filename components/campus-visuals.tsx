@@ -38,7 +38,7 @@ export function CampusShowcase({ ur }: { ur: boolean }) {
     </div>
     <div className="school-marks">
       <p className="marks-heading">{ur ? "اسکول کے تعارفی مواد میں درج لوگوز" : "MARKS FEATURED IN THE SCHOOL’S INTRODUCTORY MATERIAL"}</p>
-      <div className="marks-grid">{marks.map(mark => <div className="mark-tile" key={mark.name}><svg viewBox={mark.crop} role="img" aria-label={mark.name} focusable="false"><image href="/school-reference.jpg" width="1231" height="712" /></svg></div>)}</div>
+      <div className="marks-grid">{marks.map(mark => { const [x, y, width, height] = mark.crop.split(" ").map(Number); return <div className="mark-tile" key={mark.name}><svg viewBox={mark.crop} role="img" aria-label={mark.name} focusable="false"><svg x={x} y={y} width={width} height={height} viewBox={mark.crop} overflow="hidden"><image href="/school-reference.jpg" width="1231" height="712" /></svg></svg></div>; })}</div>
       <p className="marks-note">{ur ? "کیمپس سے موجودہ وابستگیوں اور سرٹیفیکیشن کی تفصیل حاصل کریں۔" : "For details of current affiliations and certifications, please contact the campus."}</p>
     </div>
   </section>;
